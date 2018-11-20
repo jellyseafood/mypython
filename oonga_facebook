@@ -1,0 +1,70 @@
+#!/usr/bin/env python3.7
+
+from selenium import webdriver
+from bs4 import BeautifulSoup
+import csv
+import getpass
+import sys
+
+#CONFIDENTIAL
+print("\n-----------------PROGRAM START------------------------")
+print("Opens Facebook And Pulls Top Searches for Paymaya accounts,pages,groups\n")
+try:
+    myemail = input('Input Username: ')
+    mypass = getpass.getpass('Input Password: ')
+except KeyboardInterrupt:
+    print("\nKeyboard Interrupt!\n")
+    sys.exit()
+
+driver = webdriver.Chrome()
+driver.get("https://web.facebook.com")
+
+# get the loaded HTML source
+html = driver.page_source 
+# Hand over the page source to beautifulsoup -- use "lxml" parser
+soup = BeautifulSoup(html, "lxml")
+
+#Input details then press button
+driver.find_element_by_id("email").send_keys(myemail)
+driver.find_element_by_id("pass").send_keys(mypass)
+#link = 'input[value="Log In"]'
+driver.find_element_by_css_selector('input[value="Log In"]').click()
+
+print("\nList of all top account searches related to Paymaya -> START")
+print('"Account_Name","Account_URL"')
+driver.get("https://web.facebook.com/search/people/?q=paymaya")
+inside_soup = BeautifulSoup(driver.page_source, "lxml")
+for itemhere in inside_soup.select("a._32mo"):
+    account_name = itemhere.select_one("span").text
+    account_link = itemhere["href"]
+    print('"{}","{}"'.format(account_name,account_link))
+print("List of all top account searches related to Paymaya -> END")
+
+print("\nList of all top page searches related to Paymaya -> START")
+print('"Page_Name","Page_URL"')
+driver.get("https://web.facebook.com/search/pages/?q=paymaya")
+inside_soup = BeautifulSoup(driver.page_source, "lxml")
+for itemhere in inside_soup.select("a._32mo"):
+    page_name = itemhere.select_one("span").text
+    page_link = itemhere["href"]
+    print('"{}","{}"'.format(page_name,page_link))
+print("List of all top page searches related to Paymaya -> END")
+
+print("\nList of all top group searches related to Paymaya -> START")
+print('"Group_Name","Group_URL"')
+driver.get("https://web.facebook.com/search/groups/?q=paymaya")
+inside_soup = BeautifulSoup(driver.page_source, "lxml")
+for itemhere in inside_soup.select("div._52eh._5bcu"):
+    try:
+        groups_name = itemhere.select_one("a").text
+    except AttributeError:
+        continue
+    except:
+        print("unhandled exception")
+    groups_link = itemhere.find("a")["href"]
+    print('"{}","{}"'.format(groups_name,groups_link))
+print("List of all top group searches related to Paymaya -> END")
+
+print("\n-----------------PROGRAM END--------------------------\n")
+
+driver.close()
