@@ -30,11 +30,6 @@ driver.find_element_by_id("pass").send_keys(mypass)
 #link = 'input[value="Log In"]'
 driver.find_element_by_css_selector('input[value="Log In"]').click()
 
-#Accounts
-csv_file = open("./accounts.csv", "w")
-fields = ["account", "URL"]
-writer = csv.DictWriter(csv_file, fieldnames=fields, quoting=csv.QUOTE_ALL)
-writer.writeheader()
 print("\nList of all top account searches related to Paymaya -> START")
 print('"Account_Name","Account_URL"')
 driver.get("https://web.facebook.com/search/people/?q=paymaya")
@@ -43,19 +38,8 @@ for itemhere in inside_soup.select("a._32mo"):
     account_name = itemhere.select_one("span").text
     account_link = itemhere["href"]
     print('"{}","{}"'.format(account_name,account_link))
-    data = {
-        "account": account_name,
-        "URL": account_link
-    }
-    writer.writerow(data)
-csv_file.close
 print("List of all top account searches related to Paymaya -> END")
 
-#Pages
-csv_file = open("./pages.csv", "w")
-fields = ["page", "URL"]
-writer = csv.DictWriter(csv_file, fieldnames=fields, quoting=csv.QUOTE_ALL)
-writer.writeheader()
 print("\nList of all top page searches related to Paymaya -> START")
 print('"Page_Name","Page_URL"')
 driver.get("https://web.facebook.com/search/pages/?q=paymaya")
@@ -64,41 +48,23 @@ for itemhere in inside_soup.select("a._32mo"):
     page_name = itemhere.select_one("span").text
     page_link = itemhere["href"]
     print('"{}","{}"'.format(page_name,page_link))
-    data = {
-        "page": page_name,
-        "URL": page_link
-    }
-    writer.writerow(data)
-csv_file.close
 print("List of all top page searches related to Paymaya -> END")
 
-#Groups
-csv_file = open("./groups.csv", "w")
-fields = ["group", "URL"]
-writer = csv.DictWriter(csv_file, fieldnames=fields, quoting=csv.QUOTE_ALL)
-writer.writeheader()
 print("\nList of all top group searches related to Paymaya -> START")
 print('"Group_Name","Group_URL"')
 driver.get("https://web.facebook.com/search/groups/?q=paymaya")
 inside_soup = BeautifulSoup(driver.page_source, "lxml")
 for itemhere in inside_soup.select("div._52eh._5bcu"):
     try:
-        group_name = itemhere.select_one("a").text
+        groups_name = itemhere.select_one("a").text
     except AttributeError:
         continue
     except:
         print("unhandled exception")
-    group_link = "https://www.facebook.com" + itemhere.find("a")["href"]
-    print('"{}","{}"'.format(group_name,group_link))
-    data = {
-        "group": group_name,
-        "URL": group_link
-    }
-    writer.writerow(data)
-csv_file.close
+    groups_link = itemhere.find("a")["href"]
+    print('"{}","{}"'.format(groups_name,groups_link))
 print("List of all top group searches related to Paymaya -> END")
 
 print("\n-----------------PROGRAM END--------------------------\n")
 
-
-#driver.close()
+driver.close()
